@@ -23,7 +23,7 @@ LATEX_MATRIX = """
 \\end{bmatrix}
 """
 
-def parse_matrix(latex_matrix):
+def parse_matrix(latex_matrix) -> list:
     """解析LaTeX矩陣為Python列表"""
     rows = re.findall(r'(?:[0-9]+(?:\s*&\s*[^\\\\]+)+)', latex_matrix)
     matrix = []
@@ -33,7 +33,7 @@ def parse_matrix(latex_matrix):
         matrix.append([x for x in parts if x])
     return matrix
 
-def get_part_routes(matrix):
+def get_part_routes(matrix) -> list:
     """獲取每個零件的加工路線"""
     part_routes = []
     for row in matrix[1:]:
@@ -59,7 +59,7 @@ def get_part_routes(matrix):
             part_routes.append(route)
     return part_routes
 
-def calculate_flow_matrix(part_routes, n_departments):
+def calculate_flow_matrix(part_routes, n_departments) -> np.ndarray:
     """計算部門間的流量矩陣"""
     flow_matrix = np.zeros((n_departments, n_departments), dtype=int)
 
@@ -71,7 +71,7 @@ def calculate_flow_matrix(part_routes, n_departments):
 
     return flow_matrix
 
-def calculate_total_distance(flow_matrix, department_order):
+def calculate_total_distance(flow_matrix, department_order) -> int:
     """計算給定部門排列的總移動距離"""
     total_distance = 0
     n = len(department_order)
@@ -86,7 +86,7 @@ def calculate_total_distance(flow_matrix, department_order):
 
     return total_distance
 
-def find_optimal_sa(flow_matrix):
+def find_optimal_sa(flow_matrix) -> list:
     """使用模擬退火算法(Simulated Annealing)尋找最佳部門排列"""
     start_time = time.time()  # 記錄開始時間
 
@@ -123,7 +123,7 @@ def find_optimal_sa(flow_matrix):
     execution_time = time.time() - start_time  # 計算執行時間
     return best_solution, best_distance, execution_time
 
-def find_optimal_greedy(flow_matrix):
+def find_optimal_greedy(flow_matrix) -> list:
     """使用貪婪演算法(Greedy Algorithm)尋找最佳部門排列"""
     start_time = time.time()  # 記錄開始時間
 
@@ -152,7 +152,7 @@ def find_optimal_greedy(flow_matrix):
     execution_time = time.time() - start_time  # 計算執行時間
     return arrangement, calculate_total_distance(flow_matrix, arrangement), execution_time
 
-def find_optimal_center(flow_matrix):
+def find_optimal_center(flow_matrix) -> list:
     """使用中心放置法(Center Placement)尋找最佳部門排列"""
     start_time = time.time()  # 記錄開始時間
 
@@ -282,13 +282,7 @@ def calculate_part_distances(part_routes, department_order):
         distances[i] = total_distance
     return distances
 
-def generate_random_ftc_matrix(n_parts, n_departments, max_steps=None, max_parallel=None, seed=None):
-    if max_steps is None:
-        max_steps = 10
-    if max_parallel is None:
-        max_parallel = 3
-    if seed is not None:
-        random.seed(seed)  # 設置隨機數種子
+def generate_random_ftc_matrix(n_parts, n_departments, max_steps=None, max_parallel=None, seed=None) -> str:
     """
     隨機生成 FTC From-To Chart 矩陣
     
@@ -302,6 +296,12 @@ def generate_random_ftc_matrix(n_parts, n_departments, max_steps=None, max_paral
     返回:
     LaTeX 格式的矩陣字串
     """
+    if max_steps is None:
+        max_steps = 10
+    if max_parallel is None:
+        max_parallel = 3
+    if seed is not None:
+        random.seed(seed)  # 設置隨機數種子
     # 生成矩陣標題行（部門編號）
     matrix = []
     header = ["0"]
@@ -355,7 +355,7 @@ def generate_random_ftc_matrix(n_parts, n_departments, max_steps=None, max_paral
 
     return latex
 
-def calculate_objective_function(part_routes, department_order, quantities):
+def calculate_objective_function(part_routes, department_order, quantities) -> int:
     """
     計算目標函數值
     
@@ -378,8 +378,7 @@ def calculate_objective_function(part_routes, department_order, quantities):
         total_distance += part_distance * quantities[i]
     return total_distance
 
-# 主程式
-if __name__ == "__main__":
+def main() -> None:
     # 使用預設矩陣或生成隨機矩陣
     use_random = input("是否使用隨機生成的矩陣？(y/n): ").lower() == 'y'
 
@@ -465,3 +464,15 @@ if __name__ == "__main__":
     print("\n" + "=" * 60)
     print(f"最佳演算法：{best_algorithm}")
     print(f"最佳改善幅度：{(original_value - best_value) / original_value * 100:.2f}%")
+    print(f"最佳目標函數值：{best_value}")
+    
+# 主程式
+if __name__ == "__main__":
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n程式中斷。")
+    except Exception as e:
+        print(f"發生錯誤：{e}")
+    finally:
+        print("程式結束！")
