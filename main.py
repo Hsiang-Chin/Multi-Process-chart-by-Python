@@ -1,6 +1,5 @@
 import re
 import numpy as np
-from itertools import permutations
 import random
 import math
 import time  
