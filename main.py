@@ -5,29 +5,45 @@ import math
 import time  
 
 # LaTeX FTC From-To Chart
+# LATEX_MATRIX = """
+# \\begin{bmatrix}
+#  0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & \\\\
+#  1 & 1 & 0 & 2 & 3 & 0 & 0 & 4 & 0 & 5 & 6 & \\\\
+#  2 & 1 & 7 & 3 & 4,5 & 6 & 2 & 0 & 8 & 9 & 10 & \\\\
+#  3 & 1 & 0 & 3 & 0 & 4 & 2 & 0 & 5 & 0 & 6 & \\\\
+#  4 & 1 & 2 & 0 & 0 & 5,6,7 & 0 & 3 & 4 & 0 & 8 & \\\\
+#  5 & 1 & 0 & 2 & 3 & 5,6 & 4 & 7 & 0 & 8 & 9 & \\\\
+#  6 & 1 & 0 & 6,7 & 0 & 2,3,4 & 0 & 5 & 0 & 0 & 8 & \\\\
+#  7 & 1 & 2,5 & 3 & 7 & 6 & 4 & 0 & 0 & 8 & 9 & \\\\
+#  8 & 1 & 4 & 0 & 6 & 5 & 2 & 3 & 0 & 0 & 7 & \\\\
+#  9 & 1 & 3,4 & 2 & 0 & 0 & 0 & 0 & 5,6 & 0 & 7 & \\\\
+#  10 & 1 & 5 & 3 & 0 & 4 & 2 & 0 & 0 & 6 & 7 & \\\\
+#  11 & 1 & 0 & 2,3 & 0 & 4,5 & 0 & 0 & 7,8 & 6 & 9 &
+# \\end{bmatrix}
+# """
+
 LATEX_MATRIX = """
 \\begin{bmatrix}
- 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & \\\\
- 1 & 1 & 0 & 2 & 3 & 0 & 0 & 4 & 0 & 5 & 6 & \\\\
- 2 & 1 & 7 & 3 & 4,5 & 6 & 2 & 0 & 8 & 9 & 10 & \\\\
- 3 & 1 & 0 & 3 & 0 & 4 & 2 & 0 & 5 & 0 & 6 & \\\\
- 4 & 1 & 2 & 0 & 0 & 5,6,7 & 0 & 3 & 4 & 0 & 8 & \\\\
- 5 & 1 & 0 & 2 & 3 & 5,6 & 4 & 7 & 0 & 8 & 9 & \\\\
- 6 & 1 & 0 & 6,7 & 0 & 2,3,4 & 0 & 5 & 0 & 0 & 8 & \\\\
- 7 & 1 & 2,5 & 3 & 7 & 6 & 4 & 0 & 0 & 8 & 9 & \\\\
- 8 & 1 & 4 & 0 & 6 & 5 & 2 & 3 & 0 & 0 & 7 & \\\\
- 9 & 1 & 3,4 & 2 & 0 & 0 & 0 & 0 & 5,6 & 0 & 7 & \\\\
- 10 & 1 & 5 & 3 & 0 & 4 & 2 & 0 & 0 & 6 & 7 & \\\\
- 11 & 1 & 0 & 2,3 & 0 & 4,5 & 0 & 0 & 7,8 & 6 & 9 &
+ 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9\\
+ 1 & 1 & 0 & 0 & 4 & 2 & 5 & 6 & 3,7 & 8\\
+ 2 & 1 & 2 & 0 & 0 & 4 & 3 & 6 & 5 & 7\\
+ 3 & 1 & 0 & 4 & 0 & 5 & 0 & 2 & 3 & 6\\
+ 4 & 1 & 0 & 0 & 0 & 3 & 4,5 & 6 & 2 & 7\\
+ 5 & 1 & 0 & 2,4,6 & 5 & 3 & 0 & 0 & 7 & 8\\
+ 6 & 1 & 4,5 & 7 & 6 & 0 & 2 & 3 & 0 & 8\\
+ 7 & 1 & 0 & 2 & 0 & 3 & 0 & 0 & 0 & 4\\
+ 8 & 1 & 3 & 0 & 0 & 0 & 2 & 4 & 0 & 5\\
+ 9 & 1 & 0 & 2,5 & 4 & 0 & 0 & 0 & 3 & 6\\
+ 10 & 1 & 0 & 2,4 & 0 & 0 & 5 & 0 & 3 & 6\\
 \\end{bmatrix}
 """
 
 def parse_matrix(latex_matrix) -> list:
-    """解析LaTeX矩陣為Python列表"""
-    rows = re.findall(r'(?:[0-9]+(?:\s*&\s*[^\\\\]+)+)', latex_matrix)
+    """解析LaTeX矩陣為Python列表，並動態計算部門數量"""
+    rows = re.findall(r'(?:[0-9]+(?:\s*&\s*[^\\]+)+)', latex_matrix)
     matrix = []
     for row in rows:
-        clean_row = row.replace('\\\\', '').strip()
+        clean_row = row.replace('\\', '').strip()
         parts = [cell.strip() for cell in clean_row.split('&')]
         matrix.append([x for x in parts if x])
     return matrix
@@ -59,7 +75,7 @@ def get_part_routes(matrix) -> list:
     return part_routes
 
 def calculate_flow_matrix(part_routes, n_departments) -> np.ndarray:
-    """計算部門間的流量矩陣"""
+    """計算部門間的流量矩陣，部門編號從1到9"""
     flow_matrix = np.zeros((n_departments, n_departments), dtype=int)
 
     for route in part_routes:
@@ -71,7 +87,7 @@ def calculate_flow_matrix(part_routes, n_departments) -> np.ndarray:
     return flow_matrix
 
 def calculate_total_distance(flow_matrix, department_order) -> int:
-    """計算給定部門排列的總移動距離"""
+    """計算給定部門排列的總移動距離，部門1和部門10固定在頭和尾"""
     total_distance = 0
     n = len(department_order)
 
@@ -86,7 +102,7 @@ def calculate_total_distance(flow_matrix, department_order) -> int:
     return total_distance
 
 def find_optimal_sa(flow_matrix) -> list:
-    """使用模擬退火算法(Simulated Annealing)尋找最佳部門排列"""
+    """使用模擬退火算法(Simulated Annealing)尋找最佳部門排列，部門1和部門9固定在頭和尾"""
     start_time = time.time()  # 記錄開始時間
 
     n = len(flow_matrix)
@@ -95,14 +111,16 @@ def find_optimal_sa(flow_matrix) -> list:
     min_temperature = 0.01
     max_iterations = 10000  # 增加迭代次數
 
-    current_solution = list(range(n))
+    current_solution = list(range(1, n-1))  # 排除部門1和部門9
+    random.shuffle(current_solution)
+    current_solution = [0] + current_solution + [n-1]  # 部門1在頭，部門9在尾
     current_distance = calculate_total_distance(flow_matrix, current_solution)
     best_solution = current_solution.copy()
     best_distance = current_distance
 
     iteration = 0
     while temperature > min_temperature and iteration < max_iterations:
-        i, j = random.sample(range(n), 2)
+        i, j = random.sample(range(1, n-1), 2)  # 只在中間部門中交換
         new_solution = current_solution.copy()
         new_solution[i], new_solution[j] = new_solution[j], new_solution[i]
 
@@ -123,24 +141,23 @@ def find_optimal_sa(flow_matrix) -> list:
     return best_solution, best_distance, execution_time
 
 def find_optimal_greedy(flow_matrix) -> list:
-    """使用貪婪演算法(Greedy Algorithm)尋找最佳部門排列"""
+    """使用貪婪演算法(Greedy Algorithm)尋找最佳部門排列，部門1和部門9固定在頭和尾"""
     start_time = time.time()  # 記錄開始時間
 
     n = len(flow_matrix)
     total_flow = np.sum(flow_matrix, axis=0) + np.sum(flow_matrix, axis=1)
-    sorted_depts = sorted(range(n), key=lambda x: total_flow[x], reverse=True)
+    sorted_depts = sorted(range(1, n-1), key=lambda x: total_flow[x], reverse=True)  # 排除部門1和部門9
 
-    arrangement = [-1] * n
-    arrangement[0] = sorted_depts[0]
+    arrangement = [0] + [-1] * (n-2) + [n-1]  # 部門1在頭，部門9在尾
 
-    for i in range(1, n):
-        best_pos = 0
+    for i in range(len(sorted_depts)):
+        best_pos = 1  # 從第二個位置開始
         best_distance = float('inf')
 
-        for pos in range(n):
+        for pos in range(1, n-1):  # 只在中間部門中選擇
             if arrangement[pos] == -1:
                 arrangement[pos] = sorted_depts[i]
-                distance = calculate_total_distance(flow_matrix, [x for x in arrangement if x != -1])
+                distance = calculate_total_distance(flow_matrix, arrangement)
                 if distance < best_distance:
                     best_distance = distance
                     best_pos = pos
@@ -152,23 +169,23 @@ def find_optimal_greedy(flow_matrix) -> list:
     return arrangement, calculate_total_distance(flow_matrix, arrangement), execution_time
 
 def find_optimal_center(flow_matrix) -> list:
-    """使用中心放置法(Center Placement)尋找最佳部門排列"""
+    """使用中心放置法(Center Placement)尋找最佳部門排列，部門1和部門9固定在頭和尾"""
     start_time = time.time()  # 記錄開始時間
 
     n = len(flow_matrix)
     total_flow = np.sum(flow_matrix, axis=0) + np.sum(flow_matrix, axis=1)
-    sorted_depts = sorted(range(n), key=lambda x: total_flow[x], reverse=True)
+    sorted_depts = sorted(range(1, n-1), key=lambda x: total_flow[x], reverse=True)  # 排除部門1和部門9
 
-    arrangement = [-1] * n
-    mid = n // 2
+    arrangement = [0] + [-1] * (n-2) + [n-1]  # 部門1在頭，部門9在尾
+    mid = (n - 2) // 2 + 1
     left = mid - 1
     right = mid
 
     for i, dept in enumerate(sorted_depts):
-        if i % 2 == 0 and right < n:
+        if i % 2 == 0 and right < n-1:
             arrangement[right] = dept
             right += 1
-        elif left >= 0:
+        elif left >= 1:
             arrangement[left] = dept
             left -= 1
 
@@ -176,25 +193,26 @@ def find_optimal_center(flow_matrix) -> list:
     return arrangement, calculate_total_distance(flow_matrix, arrangement), execution_time
 
 def find_optimal_genetic(flow_matrix, population_size=200, generations=500):
-    """使用基因演算法(Genetic Algorithm)尋找最佳部門排列"""
+    """使用基因演算法(Genetic Algorithm)尋找最佳部門排列，部門1和部門9固定在頭和尾"""
     start_time = time.time()  # 記錄開始時間
 
     n = len(flow_matrix)
 
     def create_individual():
-        return random.sample(range(n), n)
+        middle = random.sample(range(1, n-1), n-2)  # 排除部門1和部門9
+        return [0] + middle + [n-1]  # 部門1在頭，部門9在尾
 
     def crossover(parent1, parent2):
-        point = random.randint(1, n-1)
-        child = parent1[:point]
+        point = random.randint(1, n-3)
+        child = parent1[:point+1]
         for x in parent2:
-            if x not in child:
+            if x not in child and x != 0 and x != n-1:
                 child.append(x)
-        return child
+        return [0] + child + [n-1]
 
     def mutate(individual):
         if random.random() < 0.3:  # 增加突變率
-            i, j = random.sample(range(n), 2)
+            i, j = random.sample(range(1, n-1), 2)  # 只在中間部門中交換
             individual[i], individual[j] = individual[j], individual[i]
         return individual
 
@@ -228,7 +246,7 @@ def find_optimal_genetic(flow_matrix, population_size=200, generations=500):
     return best_solution, best_distance, execution_time
 
 def find_optimal_hybrid(flow_matrix):
-    """使用混合演算法：先用貪婪演算法找到初始解，再用模擬退火算法優化"""
+    """使用混合演算法：先用貪婪演算法找到初始解，再用模擬退火算法優化，部門1和部門9固定在頭和尾"""
     start_time = time.time()
 
     # 先用貪婪演算法找到初始解
@@ -248,7 +266,7 @@ def find_optimal_hybrid(flow_matrix):
 
     iteration = 0
     while temperature > min_temperature and iteration < max_iterations:
-        i, j = random.sample(range(n), 2)
+        i, j = random.sample(range(1, n-1), 2)  # 只在中間部門中交換
         new_solution = current_solution.copy()
         new_solution[i], new_solution[j] = new_solution[j], new_solution[i]
 
