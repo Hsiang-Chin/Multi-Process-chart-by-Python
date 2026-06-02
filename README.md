@@ -1,5 +1,7 @@
 # 多項產品程序圖(Multi-Process chart)python實作
 
+![Tests](https://github.com/Hsiang-Chin/Multi-Process-chart-by-Python/actions/workflows/tests.yml/badge.svg)
+
 ## 目錄
 - [上手指南](#上手指南)
   - [安裝環境](#安裝環境)
