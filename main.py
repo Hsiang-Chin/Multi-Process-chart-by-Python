@@ -204,7 +204,7 @@ def find_optimal_genetic(flow_matrix, population_size=200, generations=500):
 
     def crossover(parent1, parent2):
         point = random.randint(1, n-3)
-        child = parent1[:point+1]
+        child = parent1[1:point+1]
         for x in parent2:
             if x not in child and x != 0 and x != n-1:
                 child.append(x)
